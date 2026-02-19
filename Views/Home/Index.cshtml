@@ -1,0 +1,24 @@
+﻿<div id="app">
+    <v-app>
+        <v-container>
+            <v-text-field label="My field" ></v-text-field>
+        </v-container>
+    </v-app>
+</div>
+@section Scripts {
+    <script>
+      const { createApp } = Vue
+      const { createVuetify } = Vuetify
+      const vuetify = createVuetify({
+            locale: {
+                locale: 'ar',       // Current locale
+                fallback: 'en',
+                rtl: {
+                    ar: true,        // Set 'ar' to use RTL
+                }
+            }
+        })
+      const app = createApp()
+      app.use(vuetify).mount('#app')
+    </script>
+}
