@@ -28,3 +28,12 @@
 /home/ayman/Documents/netproject/obj/Debug/net8.0/netproject.pdb
 /home/ayman/Documents/netproject/obj/Debug/net8.0/netproject.genruntimeconfig.cache
 /home/ayman/Documents/netproject/obj/Debug/net8.0/ref/netproject.dll
+/home/ayman/Documents/netproject/bin/Debug/net8.0/Dapper.dll
+/home/ayman/Documents/netproject/bin/Debug/net8.0/System.Data.SQLite.dll
+/home/ayman/Documents/netproject/bin/Debug/net8.0/runtimes/linux-x64/native/SQLite.Interop.dll
+/home/ayman/Documents/netproject/bin/Debug/net8.0/runtimes/osx-x64/native/SQLite.Interop.dll
+/home/ayman/Documents/netproject/bin/Debug/net8.0/runtimes/win-x64/native/SQLite.Interop.dll
+/home/ayman/Documents/netproject/bin/Debug/net8.0/runtimes/win-x86/native/SQLite.Interop.dll
+/home/ayman/Documents/netproject/obj/Debug/net8.0/netproject.csproj.AssemblyReference.cache
+/home/ayman/Documents/netproject/obj/Debug/net8.0/netproject.sourcelink.json
+/home/ayman/Documents/netproject/obj/Debug/net8.0/netproject.csproj.Up2Date
