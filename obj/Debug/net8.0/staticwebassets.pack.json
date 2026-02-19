@@ -13,6 +13,14 @@
       "PackagePath": "staticwebassets/favicon.ico"
     },
     {
+      "Id": "/home/ayman/Documents/netproject/wwwroot/js/app.js",
+      "PackagePath": "staticwebassets/js/app.js"
+    },
+    {
+      "Id": "/home/ayman/Documents/netproject/wwwroot/js/pages/account/login.js",
+      "PackagePath": "staticwebassets/js/pages/account/login.js"
+    },
+    {
       "Id": "/home/ayman/Documents/netproject/wwwroot/js/site.js",
       "PackagePath": "staticwebassets/js/site.js"
     },
