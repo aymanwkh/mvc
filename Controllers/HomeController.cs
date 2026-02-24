@@ -21,7 +21,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        GetData();
+        // GetData();
         return View();
     }
 
@@ -30,7 +30,7 @@ public class HomeController : Controller
         return View();
     }
     public void GetData() {
-        var connectionString = "Data Source=products.db";
+        var connectionString = "Data Source=sqlite.db";
         var product= new Product(1, "product1", 10);
         using (IDbConnection connection = new SQLiteConnection(connectionString))
         {

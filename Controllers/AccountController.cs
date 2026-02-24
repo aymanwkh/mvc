@@ -19,4 +19,9 @@ public class AccountController : Controller
     {
         return View();
     }
+    public IActionResult Login(string username, string password)
+    {
+        Console.WriteLine("username = " + username);
+        return View();
+    }
 }

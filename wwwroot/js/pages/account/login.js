@@ -1,8 +1,27 @@
 const { ref } = Vue
 const setup = () => {
   const visible = ref(false)
+  const username = ref('')
+  const password = ref('')
+  function login() {
+    const apiUrl = '/account/login'; // Replace with a valid API endpoint
+    const dataToSend = { username: username.value, password: password.value };
+    fetch(apiUrl, {
+      method: 'POST', // Specify the method
+      headers: {
+        'Content-Type': 'application/json', // Indicate the content type
+      },
+      body: JSON.stringify(dataToSend), // Convert the data to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch(error => console.error('Error:', error));
+  }
   return {
-    visible
+    visible,
+    username,
+    password,
+    login
   }
 }
 const template = /*html*/`
@@ -26,6 +45,7 @@ const template = /*html*/`
         placeholder="Email address"
         prepend-inner-icon="mdi-email-outline"
         variant="outlined"
+        v-model="username"
       ></v-text-field>
 
       <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
@@ -48,6 +68,7 @@ const template = /*html*/`
         prepend-inner-icon="mdi-lock-outline"
         variant="outlined"
         @click:append-inner="visible = !visible"
+        v-model="password"
       ></v-text-field>
 
       <v-card
@@ -66,6 +87,7 @@ const template = /*html*/`
         size="large"
         variant="tonal"
         block
+        @click="login"
       >
         Log In
       </v-btn>
