@@ -10,6 +10,7 @@ namespace netproject.Controllers;
 public class AccountController : Controller
 {
     private readonly ILogger<AccountController> _logger;
+    public record LoginModel(string username, string password);
     public AccountController(ILogger<AccountController> logger)
     {
         _logger = logger;
@@ -19,9 +20,10 @@ public class AccountController : Controller
     {
         return View();
     }
-    public IActionResult Login(string username, string password)
+    [HttpPost]
+    public IActionResult Login([FromBody] LoginModel model)
     {
-        Console.WriteLine("username = " + username);
+        Console.WriteLine("username = " + model.username);
         return View();
     }
 }

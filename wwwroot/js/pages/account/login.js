@@ -3,19 +3,17 @@ const setup = () => {
   const visible = ref(false)
   const username = ref('')
   const password = ref('')
-  function login() {
+  const login = async () => {
     const apiUrl = '/account/login'; // Replace with a valid API endpoint
     const dataToSend = { username: username.value, password: password.value };
-    fetch(apiUrl, {
+    const response = await fetch(apiUrl, {
       method: 'POST', // Specify the method
       headers: {
         'Content-Type': 'application/json', // Indicate the content type
       },
       body: JSON.stringify(dataToSend), // Convert the data to a JSON string
     })
-    .then(response => response.json())
-    .then(data => console.log('Success:', data))
-    .catch(error => console.error('Error:', error));
+    console.log('response = ', response)
   }
   return {
     visible,
