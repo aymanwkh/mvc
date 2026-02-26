@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using netproject.Models;
 using Dapper;
 using System.Data.SQLite;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace netproject.Controllers;
 
@@ -21,9 +24,26 @@ public class AccountController : Controller
         return View();
     }
     [HttpPost]
-    public IActionResult Login([FromBody] LoginModel model)
+    public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         Console.WriteLine("username = " + model.username);
-        return View();
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, model.username),
+            new Claim(ClaimTypes.Role, "Admin"), // Example role claim
+        };
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            // Configure persistent cookies, expiration, etc.
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties);
+
+// Redirect to a protected page
+        return RedirectToAction("Index", "Home");
     }
 }

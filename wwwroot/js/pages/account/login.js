@@ -13,7 +13,7 @@ const setup = () => {
       },
       body: JSON.stringify(dataToSend), // Convert the data to a JSON string
     })
-    console.log('response = ', response)
+    if (response.ok) window.location.href = response.url 
   }
   return {
     visible,

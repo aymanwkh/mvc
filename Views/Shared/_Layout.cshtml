@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/netproject.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.11.8/dist/vuetify.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=roboto:400,500,700" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@4.0.0/dist/vuetify.min.css" />
 </head>
 <body>
     <header>
@@ -31,13 +32,8 @@
             </div>
         </nav>
     </header>
-    <div class="container" id="app">
-        <v-app>
-            <v-locale-provider rtl>
-                
-            @RenderBody()
-            </v-locale-provider>
-        </main>
+    <div class="container">
+        @RenderBody()
     </div>
 
     <footer class="border-top footer text-muted">
@@ -49,7 +45,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.11.8/dist/vuetify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@4.0.0/dist/vuetify.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script src="~/js/app.js"></script>
 </body>
