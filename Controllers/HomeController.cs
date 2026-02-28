@@ -30,22 +30,20 @@ public class HomeController : Controller
     {
         return View();
     }
-    // [Authorize]
+    [Authorize]
     [HttpGet]
-    public IActionResult GetData([FromQuery] string pageNo)
+    public IActionResult getdata(int page, int itemsPerPage)
     {
-        var p = HttpContext.Request.QueryString;
-
-        Console.WriteLine("paging p = ", p);
-        // Console.WriteLine("itemsPerPage = ", ItemsPerPage);
         var dbPath = _configuration["DatabaseConfig:Path"];
         var connectionString = $"Data Source={dbPath}";
         using IDbConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
-        var selectSql = "SELECT * FROM Product";
-        var result = connection.Query(selectSql).ToList();
-        Console.WriteLine("result = " + result.Count());
-        return Ok(result);
+        var sql = "SELECT count(1) FROM Product";
+        var total = connection.ExecuteScalar(sql);
+        var skippedRows = (page - 1) * itemsPerPage;
+        var selectSql = "SELECT * FROM Product limit @itemsPerPage offset @skippedRows";
+        var result = connection.Query(selectSql, new {itemsPerPage, skippedRows}).ToList();
+        return Ok(new {result, total});
     }
     public void SetData() {
         var dbPath = _configuration["DatabaseConfig:Path"];

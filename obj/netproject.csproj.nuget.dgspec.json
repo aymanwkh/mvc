@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/ayman/Documents/netproject/netproject.csproj": {}
+    "/home/ayman/Projects/mvc/netproject.csproj": {}
   },
   "projects": {
-    "/home/ayman/Documents/netproject/netproject.csproj": {
+    "/home/ayman/Projects/mvc/netproject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/ayman/Documents/netproject/netproject.csproj",
+        "projectUniqueName": "/home/ayman/Projects/mvc/netproject.csproj",
         "projectName": "netproject",
-        "projectPath": "/home/ayman/Documents/netproject/netproject.csproj",
+        "projectPath": "/home/ayman/Projects/mvc/netproject.csproj",
         "packagesPath": "/home/ayman/.nuget/packages/",
-        "outputPath": "/home/ayman/Documents/netproject/obj/",
+        "outputPath": "/home/ayman/Projects/mvc/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/ayman/.nuget/NuGet/NuGet.Config"

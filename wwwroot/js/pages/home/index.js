@@ -24,11 +24,11 @@ const setup = () => {
     const queryString = new URLSearchParams(params).toString();
     const apiEndpoint = '/home/getData';
     const urlWithParams = `${apiEndpoint}?${queryString}`;
-    console.log('url = ', urlWithParams)
-    const response = await fetch('/home/getData?page=1')
+    const response = await fetch(urlWithParams)
     const data = await response.json()
-    serverItems.value = data
-    totalItems.value = data.length
+    console.log('data = ', data)
+    serverItems.value = data.result
+    totalItems.value = data.total
     loading.value = false
   }
   return {
