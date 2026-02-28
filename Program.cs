@@ -11,7 +11,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         // Configure other options like access denied path, cookie expiration, etc.
     });
 var app = builder.Build();
-
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Incoming request: {context.Request.Method} {context.Request.Path} {context.Request.QueryString}");
+    await next(); // Calls the next middleware in the pipeline
+    Console.WriteLine($"Outgoing response: {context.Response.StatusCode}");
+});
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -20,7 +25,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

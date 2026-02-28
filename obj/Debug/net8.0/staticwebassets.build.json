@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "dFKliJy2tnkVgdww0dfTbEEJ7WyDpuFiMxi4IOJ8Wiw=",
+  "Hash": "DyT3GRui5SBE/u653eWbgE6JHcMRN81y/wLGP2kEABY=",
   "Source": "netproject",
   "BasePath": "_content/netproject",
   "Mode": "Default",
@@ -129,6 +129,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/js/pages/account/login.js"
+    },
+    {
+      "Identity": "/home/ayman/Documents/netproject/wwwroot/js/pages/home/index.js",
+      "SourceId": "netproject",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/ayman/Documents/netproject/wwwroot/",
+      "BasePath": "_content/netproject",
+      "RelativePath": "js/pages/home/index.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/js/pages/home/index.js"
     },
     {
       "Identity": "/home/ayman/Documents/netproject/wwwroot/js/site.js",

@@ -11,10 +11,13 @@ namespace netproject.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IConfiguration _configuration;
     public record Product (string Name, decimal Price);
-    public HomeController(ILogger<HomeController> logger)
+    public record PagingModel (string page, string itemsPerPage);
+    public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration;
     }
     [Authorize]
     public IActionResult Index()
@@ -27,18 +30,26 @@ public class HomeController : Controller
     {
         return View();
     }
-    [Authorize]
-    public IActionResult GetData()
+    // [Authorize]
+    [HttpGet]
+    public IActionResult GetData([FromQuery] string pageNo)
     {
-        var connectionString = "Data Source=sqlite.db";
+        var p = HttpContext.Request.QueryString;
+
+        Console.WriteLine("paging p = ", p);
+        // Console.WriteLine("itemsPerPage = ", ItemsPerPage);
+        var dbPath = _configuration["DatabaseConfig:Path"];
+        var connectionString = $"Data Source={dbPath}";
         using IDbConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
         var selectSql = "SELECT * FROM Product";
-        var result = connection.Query(selectSql);
+        var result = connection.Query(selectSql).ToList();
+        Console.WriteLine("result = " + result.Count());
         return Ok(result);
     }
     public void SetData() {
-        var connectionString = "Data Source=sqlite.db";
+        var dbPath = _configuration["DatabaseConfig:Path"];
+        var connectionString = $"Data Source={dbPath}";
         using (IDbConnection connection = new SQLiteConnection(connectionString))
         {
             connection.Open();

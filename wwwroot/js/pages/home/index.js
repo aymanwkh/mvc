@@ -6,26 +6,33 @@ const setup = () => {
       title: 'ID',
       align: 'center',
       sortable: false,
-      key: 'id',
+      key: 'Id',
     },
-    { title: 'Name', key: 'name', align: 'start' },
-    { title: 'Price', key: 'price', align: 'end' },
+    { title: 'Name', key: 'Name', align: 'start' },
+    { title: 'Price', key: 'Price', align: 'end' },
   ])
   const search = ref('')
   const serverItems = ref([])
   const loading = ref(true)
   const totalItems = ref(0)
-  function loadItems ({ page, itemsPerPage, sortBy }) {
+  async function loadItems ({ page, itemsPerPage, sortBy }) {
     loading.value = true
-    const apiUrl = '/account/login';
-    fetch({ page, itemsPerPage, sortBy }).then(({ items, total }) => {
-      serverItems.value = items
-      totalItems.value = total
-      loading.value = false
-    })
+    const params = {
+      page,
+      itemsPerPage
+    };
+    const queryString = new URLSearchParams(params).toString();
+    const apiEndpoint = '/home/getData';
+    const urlWithParams = `${apiEndpoint}?${queryString}`;
+    console.log('url = ', urlWithParams)
+    const response = await fetch('/home/getData?page=1')
+    const data = await response.json()
+    serverItems.value = data
+    totalItems.value = data.length
+    loading.value = false
   }
   return {
-    itemsPerPage, headers, search, serverItems, loading, totalItems
+    itemsPerPage, headers, search, serverItems, loading, totalItems, loadItems
   }
 }
 const template = /*html*/`

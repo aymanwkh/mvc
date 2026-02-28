@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets/js/pages/account/login.js"
     },
     {
+      "Id": "/home/ayman/Documents/netproject/wwwroot/js/pages/home/index.js",
+      "PackagePath": "staticwebassets/js/pages/home/index.js"
+    },
+    {
       "Id": "/home/ayman/Documents/netproject/wwwroot/js/site.js",
       "PackagePath": "staticwebassets/js/site.js"
     },
