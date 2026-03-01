@@ -31,8 +31,13 @@ public class HomeController : Controller
         return View();
     }
     [Authorize]
+    public IActionResult Details(int id)
+    {
+        return View();
+    }
+    [Authorize]
     [HttpGet]
-    public IActionResult getdata(int page, int itemsPerPage)
+    public IActionResult getData(int page, int itemsPerPage)
     {
         var dbPath = _configuration["DatabaseConfig:Path"];
         var connectionString = $"Data Source={dbPath}";
@@ -70,6 +75,18 @@ public class HomeController : Controller
             var productCount = connection.ExecuteScalar(selectSql);
             Console.WriteLine($"products count: {productCount}");
         }
+    }
+    [Authorize]
+    [HttpGet]
+    public IActionResult getDetails(int id)
+    {
+        var dbPath = _configuration["DatabaseConfig:Path"];
+        var connectionString = $"Data Source={dbPath}";
+        using IDbConnection connection = new SQLiteConnection(connectionString);
+        connection.Open();
+        var selectSql = "SELECT * FROM Product where id = @id";
+        var result = connection.Query(selectSql, new {id}).FirstOrDefault();
+        return Ok(result);
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
