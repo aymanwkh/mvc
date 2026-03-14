@@ -5,6 +5,7 @@ using netproject.Models;
 using Dapper;
 using System.Data.SQLite;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace netproject.Controllers;
 
@@ -12,7 +13,6 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly IConfiguration _configuration;
-    public record Product (string Name, decimal Price);
     public record PagingModel (string page, string itemsPerPage);
     public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
     {
@@ -22,11 +22,10 @@ public class HomeController : Controller
     [Authorize]
     public IActionResult Index()
     {
-        SetData();
         return View();
     }
-
-    public IActionResult Privacy()
+    [Authorize]
+    public IActionResult Product()
     {
         return View();
     }
@@ -43,38 +42,75 @@ public class HomeController : Controller
         var connectionString = $"Data Source={dbPath}";
         using IDbConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
+        var createTableSql = @"
+            CREATE TABLE IF NOT EXISTS Product (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name VARCHAR(100) NOT NULL,
+                Price DECIMAL(10, 2) NOT NULL
+            );";
+        connection.Execute(createTableSql);
         var sql = "SELECT count(1) FROM Product";
-        var total = connection.ExecuteScalar(sql);
+        var total = connection.ExecuteScalar<int>(sql);
+        if (total == 0)
+        {
+            var insertSql = "INSERT INTO Product (Name, Price) VALUES (@Name, @Price)";
+            connection.Execute(insertSql, new {Name = "Product1", Price = 10});
+            connection.Execute(insertSql, new {Name = "Product2", Price = 20});
+            connection.Execute(insertSql, new {Name = "Product3", Price = 30});
+        }
         var skippedRows = (page - 1) * itemsPerPage;
         var selectSql = "SELECT * FROM Product limit @itemsPerPage offset @skippedRows";
         var result = connection.Query(selectSql, new {itemsPerPage, skippedRows}).ToList();
         return Ok(new {result, total});
     }
-    public void SetData() {
+    [Authorize]
+    [HttpGet]
+    public IActionResult getPages()
+    {
+        var currentUser = this.User;
+        var userName = currentUser.FindFirstValue(ClaimTypes.Name);
         var dbPath = _configuration["DatabaseConfig:Path"];
         var connectionString = $"Data Source={dbPath}";
-        using (IDbConnection connection = new SQLiteConnection(connectionString))
+        using IDbConnection connection = new SQLiteConnection(connectionString);
+        connection.Open();
+        var sql = @"Drop TABLE IF EXISTS Page;";
+        connection.Execute(sql);
+        sql = @"
+            CREATE TABLE IF NOT EXISTS Page (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name VARCHAR(100) NOT NULL,
+                Path VARCHAR(200),
+                Parent_id INTEGER
+            );";
+        connection.Execute(sql);
+        sql = "SELECT count(1) FROM Page";
+        var total = connection.ExecuteScalar<int>(sql);
+        if (total == 0)
         {
-            connection.Open();
-            var createTableSql = @"
-                CREATE TABLE IF NOT EXISTS Product (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name VARCHAR(100) NOT NULL,
-                    Price DECIMAL(10, 2) NOT NULL
-                );";
-            connection.Execute(createTableSql);
-            var insertSql = "INSERT INTO Product (Name, Price) VALUES (@Name, @Price)";
-            var product= new Product("product1", 10);
-            connection.Execute(insertSql, product);
-            Console.WriteLine($"Inserted product: {product.Name}");
-            product= new Product("product2", 20);
-            connection.Execute(insertSql, product);
-            product= new Product("product3", 30);
-            connection.Execute(insertSql, product);
-            var selectSql = "SELECT count(1) FROM Product";
-            var productCount = connection.ExecuteScalar(selectSql);
-            Console.WriteLine($"products count: {productCount}");
+            sql = "INSERT INTO Page (Name, Path, Parent_id) VALUES (@Name, @Path, @ParentId)";
+            connection.Execute(sql, new {Name = "Products", Path = string.Empty, ParentId = (int?) null});
+            connection.Execute(sql, new {Name = "Sub Products", Path = string.Empty, ParentId = 1});
+            connection.Execute(sql, new {Name = "Products Page", Path = "/home/product", ParentId = 2});
         }
+        sql = @"
+            CREATE TABLE IF NOT EXISTS User_Page (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Page_id INTEGER NOT NULL,
+                User_id VARCHAR(100) NOT NULL
+            );";
+        connection.Execute(sql);
+        sql = "SELECT count(1) FROM User_Page";
+        total = connection.ExecuteScalar<int>(sql);
+        if (total == 0)
+        {
+            sql = "INSERT INTO User_Page (Page_id, User_id) VALUES (@Page_id, @User_id)";
+            connection.Execute(sql, new {Page_id = 1, User_id = userName});
+            connection.Execute(sql, new {Page_id = 2, User_id = userName});
+            connection.Execute(sql, new {Page_id = 3, User_id = userName});
+        }
+        sql = "SELECT a.* FROM Page a join User_Page b on b.Page_id = a.id where b.User_id = @User_id";
+        var result = connection.Query(sql, new {User_id = userName}).ToList();
+        return Ok(result);
     }
     [Authorize]
     [HttpGet]

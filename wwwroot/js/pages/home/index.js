@@ -1,80 +1,94 @@
-const { ref, watch } = Vue
+const { ref, onMounted, watch } = Vue
 const setup = () => {
-    const itemsPerPage = ref(5)
-    const selected = ref()
-    const headers = ref([
-    {
-      title: 'ID',
-      align: 'center',
-      sortable: false,
-      key: 'Id',
-    },
-    { title: 'Name', key: 'Name', align: 'start' },
-    { title: 'Price', key: 'Price', align: 'end' },
-  ])
+  const pages = ref([])
+  const filteredPages = ref([])
+  const showSearch = ref(false)
   const search = ref('')
-  const serverItems = ref([])
-  const loading = ref(true)
-  const totalItems = ref(0)
-  const drawer = ref(false)
-  async function loadItems ({ page, itemsPerPage, sortBy }) {
-    loading.value = true
-    const params = {
-      page,
-      itemsPerPage
-    };
-    const queryString = new URLSearchParams(params).toString();
-    const apiEndpoint = '/home/getData';
-    const urlWithParams = `${apiEndpoint}?${queryString}`;
-    const response = await fetch(urlWithParams)
-    const data = await response.json()
-    serverItems.value = data.result
-    totalItems.value = data.total
-    loading.value = false
+  const clickme = (page) => {
+    if (page.Path) window.location.href = page.Path
+    else filteredPages.value = pages.value.filter(e => e.Parent_id == page.Id)
   }
-  function goDetails() {
-    console.log('value = ', selected.value[0])
-    window.location.href = '/home/details/' + selected.value[0]
-  }
-  watch(selected, (newVal) => {
-    if (newVal[0]) drawer.value = true
-    else drawer.value = false
+  onMounted(async () => {
+      const response = await fetch('/home/getPages')
+      const data = await response.json()
+      pages.value = data.map(e => {
+                                    if (e.Path) return {...e, icon: 'mdi-gesture-tap-button'}
+                                    else return {...e, icon: 'mdi-folder'}
+                                  })
+      filteredPages.value = pages.value.filter(e => !e.Parent_id)
+  })
+  watch(search, (val) => {
+    if (val == '') filteredPages.value = pages.value
+    else filteredPages.value = pages.value.filter(e => e.Name.includes(val))
   })
   return {
-    itemsPerPage, headers, search, serverItems, loading, totalItems, loadItems, selected, 
-    drawer, goDetails
+    pages, showSearch, clickme, filteredPages, search
   }
 }
 const template = /*html*/`
-<v-layout>
-<v-data-table-server
-    v-model:items-per-page="itemsPerPage"
-    :headers="headers"
-    :items="serverItems"
-    :items-length="totalItems"
-    :loading="loading"
-    :search="search"
-    item-value="Id"
-    show-select
-    select-strategy="single"
-    @update:options="loadItems"
-    v-model="selected"
-></v-data-table-server>
-<v-navigation-drawer
-        v-model="drawer"
-        temporary
-        location="left"
+  <v-card
+    class="mx-auto"
+    max-width="600"
+  >
+    <v-toolbar color="secondary">
+      <v-btn icon="mdi-menu" variant="text"></v-btn>
+
+      <v-toolbar-title>My files</v-toolbar-title>
+
+      <v-btn v-if="!showSearch" icon="mdi-magnify" variant="text" @click="showSearch = true"></v-btn>
+      <v-text-field v-if="showSearch"
+      density="compact"
+      placeholder="Search"
+      prepend-inner-icon="mdi-magnify"
+      variant="solo"
+      width="200"
+      flat
+      hide-details
+      single-line
+      v-model="search"
+      ></v-text-field>
+      <v-btn icon="mdi-view-module" variant="text"></v-btn>
+    </v-toolbar>
+
+    <v-list lines="two">
+
+      <v-list-item
+        v-for="(page, i) in filteredPages"
+        :key="i"
+        :title="page.Name"
+        @click="clickme(page)"
       >
-        <v-list-item
-          prepend-avatar="https://randomuser.me/api/portraits/men/78.jpg"
-          title="John Leider"
-        ></v-list-item>
+        <template v-slot:prepend>
+          <v-avatar :color="page.Path ? 'blue' : 'grey-lighten-1'">
+            <v-icon color="white">{{page.icon}}</v-icon>
+          </v-avatar>
+        </template>
 
-        <v-divider></v-divider>
+      </v-list-item>
 
-        <v-btn block @click="goDetails">Block Button1</v-btn>
-        <v-btn block>Block Button2</v-btn>
-        <v-btn block>Block Button3</v-btn>
-      </v-navigation-drawer>
-</v-layout>
+      <v-divider color="red" opacity=".7" thickness="3" gradient></v-divider>
+      <v-list-subheader inset>Files</v-list-subheader>
+
+      <v-list-item
+        v-for="file in files"
+        :key="file.title"
+        :subtitle="file.subtitle"
+        :title="file.title"
+      >
+        <template v-slot:prepend>
+          <v-avatar :color="file.color">
+            <v-icon color="white">{{ file.icon }}</v-icon>
+          </v-avatar>
+        </template>
+
+        <template v-slot:append>
+          <v-btn
+            color="grey-lighten-1"
+            icon="mdi-information"
+            variant="text"
+          ></v-btn>
+        </template>
+      </v-list-item>
+    </v-list>
+  </v-card>
 `
