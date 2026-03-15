@@ -1,0 +1,17 @@
+@model List<netproject.Controllers.NavigationViewComponent.Item>
+<!-- Replace with your project name -->
+
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <div class="container-fluid">
+        @foreach (var item in Model)
+        {
+            @if (item.Id == 1) {
+                <a class="navbar-brand" asp-area="" asp-controller="@item.ControllerName" asp-action="@item.ActionName">@item.Name</a>
+            }
+            @if (item.Id == 2) {
+                <a class="navbar-brand" asp-area="" asp-controller="@item.ControllerName" asp-action="@item.ActionName">@item.Name</a>
+            }
+
+        }
+    </div>
+</nav>
