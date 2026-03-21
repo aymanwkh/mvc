@@ -73,9 +73,7 @@ public class HomeController : Controller
         var connectionString = $"Data Source={dbPath}";
         using IDbConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
-        var sql = @"Drop TABLE IF EXISTS Page;";
-        connection.Execute(sql);
-        sql = @"
+        var sql = @"
             CREATE TABLE IF NOT EXISTS Page (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name VARCHAR(100) NOT NULL,
@@ -83,15 +81,6 @@ public class HomeController : Controller
                 Parent_id INTEGER
             );";
         connection.Execute(sql);
-        sql = "SELECT count(1) FROM Page";
-        var total = connection.ExecuteScalar<int>(sql);
-        if (total == 0)
-        {
-            sql = "INSERT INTO Page (Name, Path, Parent_id) VALUES (@Name, @Path, @ParentId)";
-            connection.Execute(sql, new {Name = "Products", Path = string.Empty, ParentId = (int?) null});
-            connection.Execute(sql, new {Name = "Sub Products", Path = string.Empty, ParentId = 1});
-            connection.Execute(sql, new {Name = "Products Page", Path = "/home/product", ParentId = 2});
-        }
         sql = @"
             CREATE TABLE IF NOT EXISTS User_Page (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,15 +88,6 @@ public class HomeController : Controller
                 User_id VARCHAR(100) NOT NULL
             );";
         connection.Execute(sql);
-        sql = "SELECT count(1) FROM User_Page";
-        total = connection.ExecuteScalar<int>(sql);
-        if (total == 0)
-        {
-            sql = "INSERT INTO User_Page (Page_id, User_id) VALUES (@Page_id, @User_id)";
-            connection.Execute(sql, new {Page_id = 1, User_id = userName});
-            connection.Execute(sql, new {Page_id = 2, User_id = userName});
-            connection.Execute(sql, new {Page_id = 3, User_id = userName});
-        }
         sql = "SELECT a.* FROM Page a join User_Page b on b.Page_id = a.id where b.User_id = @User_id";
         var result = connection.Query(sql, new {User_id = userName}).ToList();
         return Ok(result);

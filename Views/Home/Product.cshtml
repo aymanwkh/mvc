@@ -1,4 +1,14 @@
 ﻿<div id="app"></div>
 @section Scripts {
-    <script src="~/js/pages/home/product.js" asp-append-version="true"></script>
+    <script src="~/js/pages/settings/menu.js" asp-append-version="true"></script>
 }
+<style>
+    .mdi-chevron-right {
+        visibility: hidden;
+    }
+    .mdi-chevron-right::before {
+        content: "\F0141";
+        font-family: "Material Design Icons"; /* Ensure the font-family matches your library */
+        visibility: visible;
+    }
+</style>
