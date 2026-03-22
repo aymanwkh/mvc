@@ -81,6 +81,15 @@ public class HomeController : Controller
                 Parent_id INTEGER
             );";
         connection.Execute(sql);
+        sql = @"delete from page;";
+        connection.Execute(sql);
+        sql = @"insert into page (name, path, parent_id) values (@Name, @Path, @Parent) RETURNING id;";
+        int? parent_id = null;
+        parent_id = connection.ExecuteScalar<int>(sql, new {Name = "page1", Path = String.Empty, Parent = parent_id});
+        parent_id = connection.ExecuteScalar<int>(sql, new {Name = "page11", Path = String.Empty, Parent = parent_id});
+        connection.Execute(sql, new {Name = "page111", Path = "/home/product", Parent = parent_id});
+        connection.Execute(sql, new {Name = "page112", Path = String.Empty, Parent = parent_id});
+        connection.Execute(sql, new {Name = "page113", Path = String.Empty, Parent = parent_id});
         sql = @"
             CREATE TABLE IF NOT EXISTS User_Page (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,8 +97,10 @@ public class HomeController : Controller
                 User_id VARCHAR(100) NOT NULL
             );";
         connection.Execute(sql);
-        sql = "SELECT a.* FROM Page a join User_Page b on b.Page_id = a.id where b.User_id = @User_id";
-        var result = connection.Query(sql, new {User_id = userName}).ToList();
+        // sql = "SELECT a.* FROM Page a join User_Page b on b.Page_id = a.id where b.User_id = @User_id";
+        sql = "SELECT * FROM Page";
+        // var result = connection.Query(sql, new {User_id = userName}).ToList();
+        var result = connection.Query(sql).ToList();
         return Ok(result);
     }
     [Authorize]
@@ -100,8 +111,20 @@ public class HomeController : Controller
         var connectionString = $"Data Source={dbPath}";
         using IDbConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
-        var selectSql = "SELECT * FROM Product where id = @id";
-        var result = connection.Query(selectSql, new {id}).FirstOrDefault();
+        var sql = "SELECT * FROM Product where id = @id";
+        var result = connection.Query(sql, new {id}).FirstOrDefault();
+        return Ok(result);
+    }
+    [Authorize]
+    [HttpGet]
+    public IActionResult getTree()
+    {
+        var dbPath = _configuration["DatabaseConfig:Path"];
+        var connectionString = $"Data Source={dbPath}";
+        using IDbConnection connection = new SQLiteConnection(connectionString);
+        connection.Open();
+        var sql = "select * from page;";
+        var result = connection.Query(sql).ToList();
         return Ok(result);
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

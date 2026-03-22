@@ -11,6 +11,7 @@ const setup = () => {
   onMounted(async () => {
       const response = await fetch('/home/getPages')
       const data = await response.json()
+      console.log('data = ', data)
       pages.value = data.map(e => {
                                     if (e.Path) return {...e, icon: 'mdi-gesture-tap-button'}
                                     else return {...e, icon: 'mdi-folder'}
