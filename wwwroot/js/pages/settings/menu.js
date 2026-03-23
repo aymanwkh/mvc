@@ -2,78 +2,15 @@ const { ref, onMounted, watch, computed } = Vue
 const setup = () => {
   const pages = ref([])
   const active = ref([])
-  const items = ref([
-    {
-      id: 1,
-      title: 'Applications :',
-      children: [
-        { id: 2, title: 'Calendar : app' },
-        { id: 3, title: 'Chrome : app' },
-        { id: 4, title: 'Webstorm : app' },
-      ],
-    },
-    {
-      id: 5,
-      title: 'Documents :',
-      children: [
-        {
-          id: 6,
-          title: 'vuetify :',
-          children: [
-            {
-              id: 7,
-              title: 'src :',
-              children: [
-                { id: 8, title: 'index : ts' },
-                { id: 9, title: 'bootstrap : ts' },
-              ],
-            },
-          ],
-        },
-        {
-          id: 10,
-          title: 'material2 :',
-          children: [
-            {
-              id: 11,
-              title: 'src :',
-              children: [
-                { id: 12, title: 'v-btn : ts' },
-                { id: 13, title: 'v-card : ts' },
-                { id: 14, title: 'v-window : ts' },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 15,
-      title: 'Downloads :',
-      children: [
-        { id: 16, title: 'October : pdf' },
-        { id: 17, title: 'November : pdf' },
-        { id: 18, title: 'Tutorial : html' },
-      ],
-    },
-    {
-      id: 19,
-      title: 'Videos :',
-      children: [
-        {
-          id: 20,
-          title: 'Tutorials :',
-          children: [
-            { id: 21, title: 'Basic layouts : mp4' },
-            { id: 22, title: 'Advanced techniques : mp4' },
-            { id: 23, title: 'All about app : dir' },
-          ],
-        },
-        { id: 24, title: 'Intro : mov' },
-        { id: 25, title: 'Conference introduction : avi' },
-      ],
-    },
-  ])
+  const isEditing = ref(false)
+  const dialog = ref(false)
+  const subtitle = ref('')
+  const title = ref('')
+  const formModel = ref({})
+  watch(isEditing, (newVal) => {
+    subtitle.value = `${newVal ? 'Update' : 'Create'} your favorite book`
+    title.value = `${newVal ? 'Edit' : 'Add'} a Book`
+  })
   function convertToHierarchy(arr) {
     // 1. Create a map of all items, adding a 'children' array to each.
     const nodeMap = arr.reduce((acc, item) => {
@@ -92,14 +29,13 @@ const setup = () => {
             // (which is referenced in nodeMap) into the parent's children array.
             const parent = nodeMap[item.Parent_id];
             if (parent) {
-                parent.children.push(nodeMap[item.Id]);
+              parent.children.push(nodeMap[item.Id]);
             }
         }
     });
 
     return tree;
 }
-
 const selected = computed(() => {
     if (!active.value.length) return undefined
 
@@ -107,11 +43,50 @@ const selected = computed(() => {
 
     return id
   })
-function add() {
-
+function edit() {
+  isEditing.value = true
+  dialog.value = true
+  formModel.value = pages.value.find(e => e.Id == selected.value)
 }
+function addSub() {
+  isEditing.value = false
+  dialog.value = true
+  formModel.value = {
+    Parent_id: selected,
+    Name: '',
+    Path: ''
+  }
+}
+function addPeer() {
+  isEditing.value = false
+  dialog.value = true
+  const current = pages.value.find(e => e.Id == selected.value)
+  formModel.value = {
+    Parent_id: current.Parent_id,
+    Name: '',
+    Path: ''
+  }
+}
+  const save = async () => {
+    const apiUrl = '/home/addPage'; // Replace with a valid API endpoint
+    console.log('form == ', formModel.value)
+    const response = await fetch(apiUrl, {
+      method: 'POST', // Specify the method
+      headers: {
+        'Content-Type': 'application/json', // Indicate the content type
+      },
+      body: JSON.stringify(formModel.value), // Convert the data to a JSON string
+    })
+    console.log('response == ', response)
+    if (response.ok) {
+      dialog.value = false 
+      const response = await fetch('/home/getPages')
+      const data = await response.json()
+      pages.value = convertToHierarchy(data);
+    }
+  }
     onMounted(async () => {
-      const response = await fetch('/home/getTree')
+      const response = await fetch('/home/getPages')
       const data = await response.json()
       pages.value = convertToHierarchy(data);
 
@@ -122,29 +97,47 @@ function add() {
       // filteredPages.value = pages.value.filter(e => !e.Parent_id)
   })
   return {
-    items, pages, active, selected, add
+    pages, active, selected, isEditing, subtitle, title, formModel, save, dialog, addPeer, addSub, edit
   }
 }
 
 const template = /*html*/`
-<v-card>
+<v-container>
+  <v-card>
     <v-toolbar
       color="surface-light"
       density="compact"
       title="Local hotspots"
       flat
     >
-            <v-btn
-            v-show="selected"
-            class="me-2"
-            prepend-icon="mdi-plus"
-            rounded="lg"
-            text="Add a Book"
-            border
-            @click="add"
-          ></v-btn>
-
-  </v-toolbar>
+      <v-btn
+        v-show="selected"
+        class="me-2"
+        prepend-icon="mdi-plus"
+        rounded="lg"
+        text="اضافة مثيل"
+        border
+        @click="addPeer"
+      ></v-btn>
+      <v-btn
+        v-show="selected"
+        class="me-2"
+        prepend-icon="mdi-plus"
+        rounded="lg"
+        text="اضافة تابع"
+        border
+        @click="addSub"
+      ></v-btn>
+      <v-btn
+        v-show="selected"
+        class="mx-2"
+        prepend-icon="mdi-pencil"
+        rounded="lg"
+        text="تعديل"
+        border
+        @click="edit"
+      ></v-btn>
+    </v-toolbar>
     <v-treeview
       v-model:activated="active"
       :items="pages"
@@ -154,4 +147,29 @@ const template = /*html*/`
     >
     </v-treeview>
 </v-card>
+<v-dialog v-model="dialog" max-width="500">
+    <v-card
+      :subtitle
+      :title
+    >
+      <template v-slot:text>
+        <v-row>
+          <v-text-field v-model="formModel.Name" label="Name"></v-text-field>
+        </v-row>
+        <v-row>
+          <v-text-field v-model="formModel.Path" label="Path"></v-text-field>
+        </v-row>
+      </template>
+
+      <v-divider></v-divider>
+
+      <v-card-actions class="bg-surface-light">
+        <v-btn text="Cancel" variant="plain" @click="dialog = false"></v-btn>
+<v-spacer></v-spacer>
+
+        <v-btn text="Save" @click="save"></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</v-container>
 `

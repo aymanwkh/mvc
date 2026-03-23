@@ -14,6 +14,7 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly IConfiguration _configuration;
     public record PagingModel (string page, string itemsPerPage);
+    public record PageModel (int Id, string Name, string Path, int? Parent_id);
     public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
     {
         _logger = logger;
@@ -81,25 +82,7 @@ public class HomeController : Controller
                 Parent_id INTEGER
             );";
         connection.Execute(sql);
-        sql = @"delete from page;";
-        connection.Execute(sql);
-        sql = @"insert into page (name, path, parent_id) values (@Name, @Path, @Parent) RETURNING id;";
-        int? parent_id = null;
-        parent_id = connection.ExecuteScalar<int>(sql, new {Name = "page1", Path = String.Empty, Parent = parent_id});
-        parent_id = connection.ExecuteScalar<int>(sql, new {Name = "page11", Path = String.Empty, Parent = parent_id});
-        connection.Execute(sql, new {Name = "page111", Path = "/home/product", Parent = parent_id});
-        connection.Execute(sql, new {Name = "page112", Path = String.Empty, Parent = parent_id});
-        connection.Execute(sql, new {Name = "page113", Path = String.Empty, Parent = parent_id});
-        sql = @"
-            CREATE TABLE IF NOT EXISTS User_Page (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Page_id INTEGER NOT NULL,
-                User_id VARCHAR(100) NOT NULL
-            );";
-        connection.Execute(sql);
-        // sql = "SELECT a.* FROM Page a join User_Page b on b.Page_id = a.id where b.User_id = @User_id";
         sql = "SELECT * FROM Page";
-        // var result = connection.Query(sql, new {User_id = userName}).ToList();
         var result = connection.Query(sql).ToList();
         return Ok(result);
     }
@@ -116,15 +99,15 @@ public class HomeController : Controller
         return Ok(result);
     }
     [Authorize]
-    [HttpGet]
-    public IActionResult getTree()
+    [HttpPost]
+    public IActionResult AddPage([FromBody] PageModel pageModel)
     {
         var dbPath = _configuration["DatabaseConfig:Path"];
         var connectionString = $"Data Source={dbPath}";
         using IDbConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
-        var sql = "select * from page;";
-        var result = connection.Query(sql).ToList();
+        var sql = "INSERT INTO Page (Name, Path, Parent_id) VALUES (@Name, @Path, @Parent_id)";
+        var result = connection.Execute(sql, pageModel);
         return Ok(result);
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
